@@ -1,6 +1,7 @@
-const {urlValidation, emailValidation} = require('./functions/validation')
+const {urlValidation} = require('./functions/validation')
 const {scrapeData} = require('./functions/scrape')
-let url, container;
+const {writeOutput} = require('./functions/writer')
+let url, container, outputFormat = 'json';
 let elements = [];
 let args = process.argv.slice(2)
 
@@ -17,7 +18,7 @@ args.forEach(function (val, index, array) {
             url = val
             console.log("URL: " + url);
         }else{
-            throw Error("args[0]: "+ val +" is not a valid URL")
+            throw Error("args[0]: "+ url +" is not a valid URL")
         }
     }else if (index == 1){
         container = val
@@ -35,8 +36,26 @@ args.forEach(function (val, index, array) {
             }
         })
         console.log("}")
+    }else if (index == 3){
+        outputFormat = val
+        if (outputFormat.toUpperCase() === 'XLSX' || outputFormat.toUpperCase() === '.XLSX') {
+            console.log("Output Format: " + outputFormat);
+            outputFormat = 'xlsx'
+        }else if (val.toUpperCase() === 'JSON' || outputFormat.toUpperCase() === '.JSON' ||  outputFormat.toUpperCase() === ""){
+            console.log("Output Format: " + outputFormat);
+        }else{
+            throw Error("Invalid Output Format: " + outputFormat)
+        }
     }
   });
-
-
-  scrapeData(url, container, elements)
+  let data
+  const f = async() => {
+    data = await scrapeData(url, container, elements)
+    if (data){
+        writeOutput(data, outputFormat, container.replaceAll(' ', '_'))
+    }
+    console.log('Data is saved in the "out" folder');
+  }
+ f()
+ 
+  //console.log(data)

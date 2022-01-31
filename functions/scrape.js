@@ -1,5 +1,6 @@
 const request = require('request')
 const cheerio = require('cheerio')
+let data = [];
 
 
 const scrapeData = (url, container, elements) => {
@@ -7,13 +8,22 @@ const scrapeData = (url, container, elements) => {
         request(url, (error, response, html) => {
             if (!error && response.statusCode == 200) {
                 const $ = cheerio.load(html)
-                const containerArr = $(container)
+                const containerHTML = $(container)
 
-                containerArr.each((i, singleContainer) => {
+                containerHTML.each((i, singleContainer) => {
+                    let containerObj = {};
                     elements.forEach(element => {
-                        console.log($(singleContainer).find(element).text());
+                        let value = $(singleContainer).find(element).text()
+                        element = element.replaceAll(' ', '_')
+                                         .replaceAll('.', '')
+                                         .replaceAll('#', '')
+                        containerObj[element] = value != null ? value : "";
                     });
+                    data.push(containerObj)
                 })
+                resolve(data)
+            }else{
+                throw Error(error)
             }
         })
     })
