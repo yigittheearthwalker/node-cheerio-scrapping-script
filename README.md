@@ -33,4 +33,9 @@ If all good, you should receive the output in the ***out*** folder. Default outp
 
 So far this is it. The next feature I want to develop is to handle ***pagination*** so it can iterate over the pages.
 
+###### Packages Used:
+- cheerio
+- request
+- exceljs
+
 
